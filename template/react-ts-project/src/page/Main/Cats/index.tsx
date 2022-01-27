@@ -1,14 +1,13 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import _axios from "@/utils/axios";
-import Search from "@/Components/Search";
-import { Input, Select, Table, Button, message } from "antd";
+import { Search } from "@/Components";
+import { Input, Table, Button, message } from "antd";
 
 import ModalEdit from "./ModalEdit";
-const { Column, ColumnGroup } = Table;
-const { Option } = Select;
+const { Column } = Table;
 
 interface catQuery {
-  catName?: string;
+  name?: string;
   pageNum: number;
   pageSize: number;
 }
@@ -19,11 +18,10 @@ export interface CatSchema {
   age: string | number;
 }
 
-function Cats() {
+const Cats = () => {
   const [modalShow, setModalShow] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [catName, setCatName] = useState("");
-  // const [serviceStatus, setServiceStatus] = useState("");
+  const form = Search.useSearchForm();
   const [query, setQuery] = useState({
     pageNum: 1,
     pageSize: 10,
@@ -31,11 +29,12 @@ function Cats() {
   const [total, setTotal] = useState(0);
   const [tabledata, setTabledata] = useState([]);
   const [rowData, setRowData] = useState({} as CatSchema);
+  const [searchForm, setSearchForm] = useState({});
   // 获取数据列表
   const getList = (param: catQuery) => {
     setLoading(true);
     _axios
-      .get(`/cats${param.catName ? "?name=" + param.catName : ""}`)
+      .get(`/cats${param.name ? "?name=" + param.name : ""}`)
       // _axios.post("/cms/service/page", { ...param })
       .then((res: any) => {
         if (res.code === 1) {
@@ -49,19 +48,14 @@ function Cats() {
         setLoading(false);
       });
   };
+  // 查询方法只对SearchForm进行赋值 接口调用交给Effect中处理
   // 查询
   const handleSearch = () => {
-    setQuery({ ...query, pageNum: 1 });
-    getList({ ...query, pageNum: 1, catName });
+    setSearchForm({ ...form.getValue() });
   };
   // 清空
   const clear = () => {
-    setCatName("");
-    setQuery({
-      ...query,
-      pageNum: 1,
-    });
-    getList({ ...query, pageNum: 1, catName: "" });
+    setSearchForm({});
   };
   // 翻页
   const onChangePage = (pageNum: number, pageSize: number) => {
@@ -70,7 +64,7 @@ function Cats() {
       pageNum,
       pageSize,
     });
-    getList({ ...query, pageNum, pageSize, catName });
+    getList({ ...query, pageNum, pageSize, ...form.getValue() });
   };
   // 打开新建窗口
   const openModal = () => {
@@ -93,16 +87,19 @@ function Cats() {
     }
   };
   const deleteItem = async (item: CatSchema) => {
-    const res: any = await _axios.post("/cats/delete");
+    const res: any = await _axios.post("/cats/delete", { id: item.id });
     if (res.code === 1) {
       message.success("删除成功");
       getList({ ...query });
     }
   };
-  // 进入时调用
+
+  // getList这个副作用 依赖于searchForm的更新而更新  更符合useEffect的心智模型
   useEffect(() => {
-    getList({ ...query, catName });
-  }, []);
+    setQuery({ ...query, pageNum: 1 });
+    getList({ ...query, ...searchForm });
+  }, [searchForm]);
+
   return (
     <>
       <Search
@@ -110,15 +107,10 @@ function Cats() {
         onClear={clear}
         createBtnTitle="新建猫猫"
         createBtnFunc={openModal}
+        form={form}
       >
         <Search.Item name="name" label="猫猫">
-          <Input
-            value={catName}
-            placeholder="请输入猫猫名称"
-            onChange={(e) => {
-              setCatName(e.target.value);
-            }}
-          ></Input>
+          <Input placeholder="请输入猫猫名称" />
         </Search.Item>
       </Search>
       <Table
@@ -132,8 +124,8 @@ function Cats() {
           onChange: onChangePage,
         }}
       >
-        <Column title="名字" dataIndex="name"></Column>
-        <Column title="年龄" dataIndex="age"></Column>
+        <Column title="名字" dataIndex="name" />
+        <Column title="年龄" dataIndex="age" />
         <Column
           title="操作"
           dataIndex="ctrl"
@@ -157,7 +149,7 @@ function Cats() {
               </Button>
             </>
           )}
-        ></Column>
+        />
       </Table>
       <ModalEdit
         show={modalShow}
@@ -167,6 +159,6 @@ function Cats() {
       />
     </>
   );
-}
+};
 
 export default Cats;
