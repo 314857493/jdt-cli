@@ -8,7 +8,7 @@ const BundleAnalyzerPlugin =
 
 module.exports = {
   devServer: {
-    host:  "{{host}}",
+    host: "{{host}}",
     port: 4000,
     proxy: {
       "/api": {
@@ -73,7 +73,7 @@ module.exports = {
         plugins: [new BundleAnalyzerPlugin({ analyzerMode })],
       };
       const config = merge(
-        Object.assign(webpackConfig, assignConfig),
+        Object.assign({ ...webpackConfig }, assignConfig),
         mergeConfig
       );
       return process.env.NODE_ENV === "production" ? config : webpackConfig;
