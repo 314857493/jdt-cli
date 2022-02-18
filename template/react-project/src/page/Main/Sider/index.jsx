@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation, useRouteMatch } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import styles from "./index.module.less";
 import { Menu } from "antd";
-import routes from "@/Router/mainRoutes";
+import mainRoutes from "@/Router/main/mainRoutes";
 import { useSelector } from "react-redux";
 
-const Index = () => {
+const Sider = () => {
   const auth = useSelector((state) => state.user.authority);
   const location = useLocation();
-  const match = useRouteMatch();
   const [selected, setSelected] = useState(location.pathname);
   const [openKeys, setOpenKeys] = useState([location.pathname.split("/")[2]]);
   const handleOpenKeys = ({ key }) => {
@@ -21,34 +20,42 @@ const Index = () => {
     } else {
       _openKeys.push(key);
     }
+    // console.log(_openKeys);
     setOpenKeys(_openKeys);
   };
-  const filteMenu = (menu) => {
-    if (menu.children) {
+  const filteMenu = (routes) => {
+    const menuRender = (menu) => {
+      if (menu.children) {
+        return (
+          <Menu.SubMenu
+            key={menu.path}
+            title={menu.title}
+            onTitleClick={handleOpenKeys}
+          >
+            {filteMenu(menu.children)}
+          </Menu.SubMenu>
+        );
+      }
       return (
-        <Menu.SubMenu
-          key={menu.path}
-          title={menu.title}
-          onTitleClick={handleOpenKeys}
-        >
-          {menu.children.map((c_item) => {
-            return (
-              <Menu.Item key={`${match.path}/${c_item.path}`}>
-                <Link to={`${match.path}/${c_item.path}`}>{c_item.title}</Link>
-              </Menu.Item>
-            );
-          })}
-        </Menu.SubMenu>
+        <Menu.Item key={menu.path}>
+          <Link to={menu.path}>{menu.title}</Link>
+        </Menu.Item>
       );
-    }
-    return (
-      <Menu.Item key={`${match.path}/${menu.path}`}>
-        <Link to={`${match.path}/${menu.path}`}>{menu.title}</Link>
-      </Menu.Item>
-    );
+    };
+    return routes.map((menu) => {
+      if (menu.exclude) return null;
+      if (menu.requireAuth) {
+        if (auth.includes(menu.name)) {
+          return menuRender(menu);
+        } else {
+          return null;
+        }
+      }
+      return menuRender(menu);
+    });
   };
   useEffect(() => {
-    setSelected(location.pathname);
+    setSelected(location.pathname.split("/").slice(2).join("/"));
     if (!openKeys.includes(location.pathname.split("/")[2])) {
       handleOpenKeys({ key: location.pathname.split("/")[2] });
     }
@@ -61,18 +68,10 @@ const Index = () => {
         mode="inline"
         style={{ border: "none" }}
       >
-        {routes.map((item) => {
-          if (item.requireAuth === false) {
-            return filteMenu(item);
-          } else {
-            if (auth.includes(item.name)) {
-              return filteMenu(item);
-            }
-          }
-        })}
+        {filteMenu(mainRoutes)}
       </Menu>
     </div>
   );
 };
 
-export default Index;
+export default Sider;

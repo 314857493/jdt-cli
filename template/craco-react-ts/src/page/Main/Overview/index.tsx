@@ -1,19 +1,19 @@
 import React, { useState, useRef } from "react";
-import { useHistory } from "react-router-dom";
-// eslint-disable-next-line no-unused-vars
+import { useNavigate } from "react-router-dom";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import _axios from "@/utils/axios";
 import dayjs from "dayjs";
 import { useStore } from "react-redux";
 
-const Index = () => {
+const Index: React.FunctionComponent = () => {
   const nowTime = dayjs(new Date()).format("YYYY/MM/DD HH:mm:ss");
   const store = useStore();
-  const history = useHistory();
+  const navigate = useNavigate();
   const reduxState = store.getState();
   const [localCounter, setLocalCounter] = useState(1);
   const objRef = useRef(1);
   const goTest = () => {
-    history.push("/main/TestPage");
+    navigate("/main/testPage");
   };
   return (
     <>
@@ -29,7 +29,8 @@ const Index = () => {
       <div
         onClick={() => {
           objRef.current += 1;
-          console.log(objRef); // ref会同步改变 但不会引起视图的变化 只会改变其值
+          // ref会同步改变 但不会引起视图的变化 只会改变其值
+          // 当有state变化时，ref在视图中会跟随state的变化而被重新渲染
         }}
       >
         {objRef.current}
@@ -37,7 +38,6 @@ const Index = () => {
       <div
         onClick={() => {
           setLocalCounter(localCounter + 1);
-          // console.log(objRef) // ref会同步改变 但不会引起视图的变化 只会改变其值
         }}
       >
         {localCounter}

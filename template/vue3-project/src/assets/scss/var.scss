@@ -1,2 +1,35 @@
-// $primary: #4762fe;
-$--color-primary: #4762fe;
+// // $primary: #4762fe;
+// $--color-primary: #4762fe;
+:root {
+  --el-color-primary: #4762fe;
+  --el-text-color-regular: #333;
+  --el-color-black: #333;
+}
+.el-form--inline .el-form-item {
+  margin-right: 20px;
+}
+.el-table {
+  --el-table-header-background-color: #e6e9ee;
+  --el-table-header-font-color: #333;
+  --el-table-border: 1px solid #e6e9ee;
+  border: var(--el-table-border);
+}
+.el-date-editor .el-range-separator {
+  width: unset;
+}
+.el-tabs__item.is-active {
+  height: 41px;
+}
+.el-pagination {
+  text-align: right;
+  margin-top: 20px;
+}
+.el-select-dropdown__item {
+  max-width: 300px;
+}
+.el-picker-panel__footer .el-button--text {
+  display: none;
+}
+.el-dropdown-menu {
+  min-width: 60px;
+}

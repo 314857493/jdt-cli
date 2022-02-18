@@ -1,8 +1,10 @@
 <template>
   <el-breadcrumb class="bread" separator-class="el-icon-arrow-right">
-    <el-breadcrumb-item v-for="(item, ind) in name" :key="ind">
-      {{ item }}
-    </el-breadcrumb-item>
+    <template v-for="(item, ind) in name">
+      <el-breadcrumb-item v-if="!!item" :key="ind">
+        {{ item }}
+      </el-breadcrumb-item>
+    </template>
   </el-breadcrumb>
 </template>
 <script>
@@ -12,7 +14,8 @@ export default {
   name: "Breadcrumb",
   setup() {
     const route = useRoute();
-    const name = computed(() => route.name.split("."));
+    // const name = computed(() => route.meta.desc.split("."));
+    const name = computed(() => route.matched.map((item) => item.meta.title));
     return {
       route,
       name,

@@ -14,26 +14,17 @@
       :model="createForm"
     >
       <el-form-item label="设备名称" prop="deviceName">
-        <!-- element+的input的maxlength有bug 暂替 -->
-        <div class="el-input el-input--small">
-          <input
-            class="el-input__inner"
-            maxlength="50"
-            style="width:346px"
-            v-model.trim="createForm.deviceName"
-          />
-        </div>
-        <!-- <el-input
+        <el-input
           :maxlength="50"
           show-word-limit
-          style="width:346px"
+          style="width: 346px"
           :clearable="true"
           v-model.trim="createForm.deviceName"
-        ></el-input> -->
+        ></el-input>
       </el-form-item>
       <el-form-item label="设备类型" prop="deviceType">
         <el-select
-          style="width:346px"
+          style="width: 346px"
           v-model="createForm.deviceType"
           :disabled="!isCreate"
         >
@@ -46,11 +37,19 @@
           </el-option>
         </el-select>
       </el-form-item>
+      <!-- <el-form-item label="设备IP地址" prop="deviceIp">
+        <el-input
+          style="width:346px"
+          :clearable="!isCreate"
+          v-model="createForm.deviceIp"
+          :disabled="!isCreate"
+        />
+      </el-form-item> -->
       <el-form-item label="设备ID" prop="deviceId">
         <el-input
           maxlength="100"
           show-word-limit
-          style="width:346px"
+          style="width: 346px"
           :clearable="isCreate"
           v-model="createForm.deviceId"
           @input="inputId"
@@ -63,7 +62,7 @@
         <el-input
           maxlength="500"
           show-word-limit
-          style="width:346px"
+          style="width: 346px"
           :clearable="true"
           v-model.trim="createForm.notifyUrl"
         />
@@ -134,7 +133,6 @@ export default {
     function open() {
       if (!isCreate.value) {
         createForm.value = deepCopy(props.rowData);
-        console.log(createForm.value);
       }
     }
     function inputId(e) {
@@ -153,17 +151,17 @@ export default {
     }
     const deviceTypeList = ref([]);
     function getDeviceTypeList() {
-      _axios.get("/api/qc-cms/device/type").then((res) => {
-        if (res.code == 1) {
-          const arr = Object.entries(res.data).map((item) => {
-            return {
-              label: item[1],
-              value: +item[0],
-            };
-          });
-          deviceTypeList.value = arr;
-        }
-      });
+      // _axios.get("/api/qc-cms/device/type").then((res) => {
+      //   if (res.code == 1) {
+      //     const arr = Object.entries(res.data).map((item) => {
+      //       return {
+      //         label: item[1],
+      //         value: +item[0],
+      //       };
+      //     });
+      //     deviceTypeList.value = arr;
+      //   }
+      // });
     }
     function handleSave() {
       createFormRef.value.validate((valid) => {
@@ -205,6 +203,7 @@ export default {
       };
       visible.value = false;
       context.emit("getList", 1);
+      // router.push("/device/deviceManage");
     }
     onMounted(() => {
       getDeviceTypeList();
@@ -217,6 +216,7 @@ export default {
       rule,
       deviceTypeList,
       getDeviceTypeList,
+      // debounceGetID,
       inputId,
       handleSave,
       handleCancel,

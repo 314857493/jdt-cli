@@ -1,10 +1,9 @@
 // import emptyParams from '@/views/Main/Service/Arrange/Design/emptyParams.json';
 
-export function goLogin(url) {
+export function goLogin() {
   if (!window.location.href.includes("returnUrl")) {
-    // const returnUrl = window.location.href.replace('/#', '');
     const returnUrl = encodeURIComponent(window.location.href);
-    window.location.href = `${url}${returnUrl}`;
+    window.location.href = `/login?returnUrl=${returnUrl}`;
   }
 }
 /**
@@ -49,7 +48,7 @@ export function addWaterMarker(str) {
  */
 export function throttle(fn, delay) {
   var previous = 0;
-  return function() {
+  return function () {
     var _this = this;
     var args = arguments;
     var now = new Date();
@@ -66,13 +65,13 @@ export function throttle(fn, delay) {
  */
 export function debounce(fn, delay) {
   var timer;
-  return function() {
+  return function () {
     var _this = this;
     var args = arguments;
     if (timer) {
       clearTimeout(timer);
     }
-    timer = setTimeout(function() {
+    timer = setTimeout(function () {
       fn.apply(_this, args);
     }, delay);
   };

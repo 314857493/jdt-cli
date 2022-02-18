@@ -3,16 +3,15 @@ import styles from "./index.module.less";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import _axios from "@/utils/axios";
 import { goLogin } from "@/utils";
-// import { createHashHistory } from "history";
 import { Dropdown, Menu } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import { setUserInfo } from "@/store/slice/userSlice";
 import type { RootState } from "@/store";
-import { useLocation, useHistory } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Header = () => {
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const userName = useSelector((state: RootState) => state.user.userName);
   const logout = () => {
@@ -50,7 +49,7 @@ const Header = () => {
       <span
         className={styles.title}
         onClick={() => {
-          history.push("/");
+          navigate("/");
         }}
       >
         这里是TITLE
@@ -60,6 +59,6 @@ const Header = () => {
       </Dropdown>
     </div>
   );
-}
+};
 
 export default Header;

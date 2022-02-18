@@ -2,13 +2,19 @@
   <div>
     <div class="main">
       <div class="top">
-        <el-button style="height:32px" type="primary" @click="createDevice">
+        <el-button style="height: 32px" type="primary" @click="createDevice">
           注册设备
         </el-button>
 
-        <el-form ref="form" :inline="true" :model="searchForm" class="search">
+        <el-form
+          ref="form"
+          @submit.prevent
+          :inline="true"
+          :model="searchForm"
+          class="search"
+        >
           <el-form-item label="设备状态" prop="status">
-            <el-select style="width:150px" v-model="searchForm.status">
+            <el-select style="width: 150px" v-model="searchForm.status">
               <el-option
                 v-for="item in statusList"
                 :key="item.value"
@@ -20,14 +26,16 @@
           </el-form-item>
           <el-form-item label="设备名称" prop="deviceName">
             <el-input
-              style="width:220px"
+              style="width: 220px"
               :clearable="true"
               v-model="searchForm.deviceName"
             />
           </el-form-item>
           <el-form-item>
             <el-button @click="reset">重置</el-button>
-            <el-button type="primary" @click="handleSearch">查询</el-button>
+            <el-button type="primary" native-type="submit" @click="handleSearch"
+              >查询</el-button
+            >
           </el-form-item>
         </el-form>
       </div>
@@ -41,7 +49,37 @@
         <el-table-column prop="deviceId" label="设备ID" />
         <el-table-column prop="deviceName" label="设备名称" />
         <el-table-column prop="deviceTypeDesc" label="设备类型" />
-        <el-table-column prop="deviceConnectStatusDesc" label="设备状态" />
+        <el-table-column prop="deviceConnectStatusDesc" label="设备状态">
+          <template #default="scope">
+            <div
+              v-if="scope.row.deviceConnectStatus == 1"
+              style="color: #00b900"
+            >
+              {{ scope.row.deviceConnectStatusDesc }}
+            </div>
+            <div
+              v-else-if="scope.row.deviceConnectStatus == 3"
+              style="color: #e1251b; display: flex; align-items: center"
+            >
+              {{ scope.row.deviceConnectStatusDesc }}
+              <el-tooltip placement="top">
+                <template #content>
+                  设备异常可能是以下原因引起： <br />
+                  1、设备异常，检测不到心跳； <br />
+                  2、设备连接失败； <br />
+                  3、服务器故障； <br />
+                  4、网络故障；
+                </template>
+                <img
+                  style="margin-left: 4px"
+                  src="@/assets/image/shape/info.svg"
+                  alt=""
+                />
+              </el-tooltip>
+            </div>
+            <div v-else>{{ scope.row.deviceConnectStatusDesc }}</div>
+          </template>
+        </el-table-column>
         <el-table-column prop="deviceIp" label="IP地址" />
         <el-table-column prop="registerTime" label="注册时间" />
         <el-table-column prop="disableTime" label="禁用时间" />
@@ -86,9 +124,8 @@
 <script>
 import { onMounted, onUnmounted, ref } from "vue";
 import CreateDevice from "./CreateDevice.vue";
-import _axios from "@/plugins/axios";
-import { ElMessage } from "element-plus";
-
+// import _axios from "@/plugins/axios";
+// import { ElMessage } from "element-plus";
 export default {
   name: "Device",
   components: { CreateDevice },
@@ -99,6 +136,10 @@ export default {
       deviceStatus: "",
     });
     const rowData = ref({});
+    // "1": "在线",
+    // "2": "离线",
+    // "3": "异常",
+    // "4": "连接中"
     const statusList = ref([
       { label: "全部", value: "" },
       { label: "在线", value: 1 },
@@ -107,14 +148,15 @@ export default {
       { label: "连接中", value: 4 },
     ]);
     function getStatusList() {
-      _axios.get("/api/qc-cms/device/connectStatus").then((res) => {
-        if (res.code == 1) {
-          const arr = Object.entries(res.data).map((item) => {
-            return { label: item[1], value: item[0] };
-          });
-          statusList.value = [{ label: "全部", value: "" }, ...arr];
-        }
-      });
+      // _axios.get("/api/qc-cms/device/connectStatus").then((res) => {
+      //   if (res.code == 1) {
+      //     const arr = Object.entries(res.data).map((item) => {
+      //       return { label: item[1], value: item[0] };
+      //     });
+      //     statusList.value = [{ label: "全部", value: "" }, ...arr];
+      //   }
+      // });
+      statusList.value = [];
     }
     const tableData = ref([]);
     const pageNum = ref(1);
@@ -131,30 +173,31 @@ export default {
     function getList(index, stopRefresh) {
       if (stopRefresh) clearTimeout(t.value);
       pageNum.value = index || 1;
-      const params = {
-        pageNum: pageNum.value,
-        pageSize: pageSize.value,
-        name: searchForm.value.deviceName || "",
-        status: searchForm.value.status || "",
-      };
+      // const params = {
+      //   pageNum: pageNum.value,
+      //   pageSize: pageSize.value,
+      //   name: searchForm.value.deviceName || "",
+      //   status: searchForm.value.status || "",
+      // };
 
-      // Object.assign(params, this.form);
       loading.value = true;
-      _axios.post("/api/qc-cms/device/page", params).then((res) => {
-        if (res.code == 1) {
-          tableData.value = res.data.list;
-          loading.value = false;
-          pageNum.value = res.data.pageNum;
-          total.value = res.data.total;
-          if (
-            tableData.value.some((x) => [4].includes(x.deviceConnectStatus))
-          ) {
-            t.value = setTimeout(() => {
-              getList(pageNum.value, true);
-            }, 5000);
-          }
-        }
-      });
+      tableData.value = [];
+      loading.value = false;
+      // _axios.post("/api/qc-cms/device/page", params).then((res) => {
+      //   if (res.code == 1) {
+      //     tableData.value = res.data.list;
+      //     loading.value = false;
+      //     pageNum.value = res.data.pageNum;
+      //     total.value = res.data.total;
+      //     if (
+      //       tableData.value.some((x) => [4, 5].includes(x.deviceConnectStatus))
+      //     ) {
+      //       t.value = setTimeout(() => {
+      //         getList(pageNum.value, true);
+      //       }, 20000);
+      //     }
+      //   }
+      // });
     }
     onUnmounted(() => {
       if (t.value !== null) {
@@ -162,25 +205,26 @@ export default {
         t.value = null;
       }
     });
+    // eslint-disable-next-line no-unused-vars
     function editStatus({ row }) {
-      return function() {
-        return new Promise((resolve, reject) => {
-          _axios
-            .get(`/api/qc-cms/device/control?id=${row.id}&inUse=${!row.inUse}`)
-            .then((res) => {
-              if (res.code == 1) {
-                getList();
-                resolve(true);
-              } else {
-                getList();
-                reject(false);
-              }
-            })
-            .catch(() => {
-              getList();
-              reject(false);
-            });
-        });
+      return function () {
+        // return new Promise((resolve, reject) => {
+        //   _axios
+        //     .get(`/api/qc-cms/device/control?id=${row.id}&inUse=${!row.inUse}`)
+        //     .then((res) => {
+        //       if (res.code == 1) {
+        //         getList();
+        //         resolve(true);
+        //       } else {
+        //         getList();
+        //         reject(false);
+        //       }
+        //     })
+        //     .catch(() => {
+        //       getList();
+        //       reject(false);
+        //     });
+        // });
       };
     }
 
@@ -193,13 +237,14 @@ export default {
       rowData.value = row;
       createDeviceRef.value.visible = true;
     }
+    // eslint-disable-next-line no-unused-vars
     function deleteItem({ row }) {
-      _axios.delete(`/api/qc-cms/device?id=${row.id}`).then((res) => {
-        if (res.code === 1) {
-          ElMessage.success("删除成功");
-          getList();
-        }
-      });
+      // _axios.delete(`/api/qc-cms/device?id=${row.id}`).then((res) => {
+      //   if (res.code === 1) {
+      //     ElMessage.success("删除成功");
+      //     getList();
+      //   }
+      // });
     }
     onMounted(() => {
       getList();
@@ -207,7 +252,6 @@ export default {
     });
 
     return {
-      // form,
       searchForm,
       statusList,
       getStatusList,

@@ -25,8 +25,6 @@
 </template>
 
 <script>
-import { computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
 export default {
   name: "Login",
   data() {
@@ -37,13 +35,15 @@ export default {
       },
     };
   },
-  setup() {
-    const route = useRoute();
-    const router = useRouter();
-    const returnUrl = computed(() => {
-      return route.query.returnUrl === "/" ? "" : route.query.returnUrl;
-    });
-    function login() {
+  computed: {
+    returnUrl() {
+      return this.$route.query.returnUrl === "/"
+        ? ""
+        : this.$route.query.returnUrl;
+    },
+  },
+  methods: {
+    login() {
       if (this.form.username === "") {
         this.$message.warning("用户名不能为空!");
         return;
@@ -63,15 +63,20 @@ export default {
           code: 1,
         });
       }).then((res) => {
+        // if (res.access_token) {
         if (res.code === 1) {
-          router.push(this.returnUrl || "/");
+          this.$router.push(this.returnUrl || "/");
+          // }
         }
       });
-    }
-    return {
-      returnUrl,
-      login,
-    };
+      // .catch((e) => {
+      //   if (e.response.status === 401) {
+      //     this.$message.warning('用户名或密码错误');
+      //   } else {
+      //     this.$message.warning(e.response.error_description);
+      //   }
+      // });
+    },
   },
 };
 </script>

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import _axios from "@/utils/axios";
-import { Search } from "@/Components";
 import { Input, Table, Button, message } from "antd";
-
+// import { withRouter } from "react-router-dom";
+import _axios from "@/utils/axios";
+import { Search } from "@/components";
 import ModalEdit from "./ModalEdit";
 const { Column } = Table;
 
@@ -18,7 +18,7 @@ export interface CatSchema {
   age: string | number;
 }
 
-const Cats = () => {
+const Cats: React.FunctionComponent = () => {
   const [modalShow, setModalShow] = useState(false);
   const [loading, setLoading] = useState(false);
   const form = Search.useSearchForm();
@@ -45,6 +45,9 @@ const Cats = () => {
           });
           setTotal(res.data.total);
         }
+        setLoading(false);
+      })
+      .catch(() => {
         setLoading(false);
       });
   };

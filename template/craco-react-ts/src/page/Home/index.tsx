@@ -1,23 +1,22 @@
 import React from "react";
 import style from "./index.module.less";
 import { Button } from "antd";
-import { useHistory } from "react-router-dom";
-import { withRouter } from "react-router";
+import { useNavigate } from "react-router-dom";
 
-const index = withRouter(() => {
-  const history = useHistory();
+const Index: React.FunctionComponent = () => {
+  const navigate = useNavigate();
   return (
     <div className={style.main}>
       <div>首页</div>
       <Button
         onClick={() => {
-          history.push("main/overview");
+          navigate("/main/overview");
         }}
       >
         去概览
       </Button>
     </div>
   );
-});
+};
 
-export default index;
+export default Index;

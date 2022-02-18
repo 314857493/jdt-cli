@@ -1,8 +1,8 @@
 <template>
   <div class="Header">
-    <!-- <img src="@/assets/image/logo.png" height="21" width="140" alt="" /> -->
+    <img src="@/assets/image/logo.png" height="21" width="140" alt="" />
     <div class="Header-right">
-      <el-dropdown @command="handleCommand">
+      <el-dropdown>
         <span class="el-dropdown-link">
           {{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
         </span>
@@ -27,7 +27,6 @@ export default {
   props: ["isNeedLogin"],
   setup(props) {
     const store = useStore();
-    console.log(store);
     const userName = computed(() => {
       return store.state.userInfo.userName || "未登录";
     });
@@ -67,8 +66,9 @@ export default {
     // cursor: pointer;
   }
   &-right {
+    display: flex;
+    justify-content: flex-end;
     flex: 1;
-    text-align: right;
     .el-dropdown {
       color: #fff;
     }

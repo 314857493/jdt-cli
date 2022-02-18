@@ -1,18 +1,13 @@
 <template>
-  <!-- <div class="Main">
-    <SideMenu />
-    <div class="Main-Layout">
-      <Header :isNeedLogin="false" /><Breadcrumb />
-      <router-view class="Main-view" />
-    </div>
-  </div> -->
   <div class="Main">
     <Header :isNeedLogin="true" />
     <div class="Main-Layout">
       <SideMenu />
       <div class="Main-Contnet">
-        <Breadcrumb /><router-view class="Main-Contnet-view" />
+        <Breadcrumb />
+        <router-view class="Main-Contnet-view" />
       </div>
+      <!-- <router-view class="Main-Contnet-view" /> -->
     </div>
   </div>
 </template>
@@ -24,9 +19,6 @@ import Breadcrumb from "@/components/Breadcrumb";
 
 export default {
   name: "Main",
-  data() {
-    return {};
-  },
   components: {
     Header,
     SideMenu,
@@ -54,6 +46,7 @@ export default {
 // }
 .Main {
   min-width: 1500px;
+  min-height: 100vh;
   &-Layout {
     display: flex;
   }
@@ -64,6 +57,8 @@ export default {
     &-view {
       // flex: 1;
       height: calc(100vh - 80px);
+      // height: calc(100vh - 40px);
+
       overflow-y: auto;
       padding: 12px;
       background: #f5f7f8;

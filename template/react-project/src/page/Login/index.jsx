@@ -1,17 +1,16 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router";
 import { Form, Input, Button, message } from "antd";
-import { createHashHistory } from "history";
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import _axios from "@/utils/axios";
 import styles from "./index.module.less";
 import { useDispatch } from "react-redux";
 import { setUserInfo } from "@/store/slice/userSlice";
-import { withRouter } from "react-router";
 
-const Index = withRouter(() => {
+const Index = () => {
   const [userNmae, setUserName] = useState("");
   const [password, setPassword] = useState("");
-  const history = createHashHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const login = () => {
     console.log(userNmae, password);
@@ -27,7 +26,7 @@ const Index = withRouter(() => {
         if (res.code === 1) {
           dispatch(setUserInfo(res.data));
           message.success("登录成功");
-          history.push("/main/overview");
+          navigate("/main/overview");
         }
       });
   };
@@ -64,6 +63,6 @@ const Index = withRouter(() => {
       </div>
     </div>
   );
-});
+};
 
 export default Index;
