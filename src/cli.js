@@ -64,5 +64,8 @@ export function cli(args) {
         message: "install now?",
       },
     ])
-    .then(handle);
+    .then(handle)
+    .then(() => {
+      console.log("项目创建完成");
+    });
 }
