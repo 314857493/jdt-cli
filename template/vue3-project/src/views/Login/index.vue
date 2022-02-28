@@ -25,31 +25,28 @@
 </template>
 
 <script>
+import { computed, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
 export default {
   name: "Login",
-  data() {
-    return {
-      form: {
-        username: "",
-        password: "",
-      },
-    };
-  },
-  computed: {
-    returnUrl() {
-      return this.$route.query.returnUrl === "/"
-        ? ""
-        : this.$route.query.returnUrl;
-    },
-  },
-  methods: {
-    login() {
-      if (this.form.username === "") {
-        this.$message.warning("用户名不能为空!");
+  setup() {
+    const form = ref({
+      username: "",
+      password: "",
+    });
+    const route = useRoute();
+    const router = useRouter();
+    const returnUrl = computed(() => {
+      return route.query.returnUrl === "/" ? "" : route.query.returnUrl;
+    });
+    function login() {
+      if (form.value.username === "") {
+        ElMessage.warning("用户名不能为空!");
         return;
       }
-      if (this.form.password === "") {
-        this.$message.warning("密码不能为空!");
+      if (form.value.password === "") {
+        ElMessage.warning("密码不能为空!");
         return;
       }
       // this.$router.push(this.returnUrl || '/main/service');
@@ -63,24 +60,19 @@ export default {
           code: 1,
         });
       }).then((res) => {
-        // if (res.access_token) {
         if (res.code === 1) {
-          this.$router.push(this.returnUrl || "/");
-          // }
+          router.push(returnUrl.value || "/");
         }
       });
-      // .catch((e) => {
-      //   if (e.response.status === 401) {
-      //     this.$message.warning('用户名或密码错误');
-      //   } else {
-      //     this.$message.warning(e.response.error_description);
-      //   }
-      // });
-    },
+    }
+    return {
+      form,
+      returnUrl,
+      login,
+    };
   },
 };
 </script>
-
 <style lang="scss">
 .Login {
   height: 100vh;
